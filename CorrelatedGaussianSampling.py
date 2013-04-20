@@ -40,18 +40,13 @@ class CorrelatedGaussianSampler:
         
     def performSVD(self):
         u, s, v = np.linalg.svd(self.invCovMatrix)
-        #uValidMatrix = (u == np.conjugate(np.transpose(u)))
-        #vValidMatrix = (v == np.conjugate(np.transpose(v)))
-        #if not ((False in uValidMatrix) and (False in vValidMatrix)):
-        #    raise NotHermiteanMatrixException()
-        self.U = v
         self.diagVar = s
+        self.U = v
         self.invU = np.linalg.inv(self.U)
         
     def sampleOneVector(self):
-        sampleVec = np.zeros(self.ndim)
-        for i in range(self.ndim):
-            sampleVec[i] = np.random.normal(scale=1./np.sqrt(self.diagVar[i]))
+        normap = lambda std: np.random.normal(scale=1./np.sqrt(std))
+        sampleVec = map(normap, self.diagVar)
         procSampleVec = np.matrix(self.invU) * np.transpose(np.matrix(sampleVec))
         procSampleVec = np.array(procSampleVec.transpose()) + self.meanVector
         return procSampleVec[0]
@@ -59,7 +54,7 @@ class CorrelatedGaussianSampler:
 def test():
     numSamples = 15000
     meanVector = np.array([1., -1., 0.])
-    covMatrix = np.array([[1., 0.1, 0.], [0.1, 1.5, -0.1], [0., -0.1, 0.01]])
+    covMatrix = np.array([[2., 0.1, 0.], [0.1, 1.5, -0.1], [0., -0.1, 0.01]])
     ndim = len(meanVector)
     sampler = CorrelatedGaussianSampler(meanVector=meanVector,
                                         covMatrix=covMatrix)
@@ -68,11 +63,10 @@ def test():
         sampledVector = sampler.sampleOneVector()
         sampledVectors.append(sampledVector)
     
-    # find the mean vector    
+    # find the mean vector
     sumVec = np.zeros(ndim)
     for i in range(numSamples):
         sumVec += sampledVectors[i]
-        samVec = np.matrix(sampledVectors[i])
     avgVector = np.transpose(np.matrix(sumVec/numSamples))
     print avgVector
 
