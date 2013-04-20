@@ -76,9 +76,6 @@ def test():
         samVec = np.transpose(np.matrix(sampledVectors[i]))
         diffVec = samVec - avgVector
         sumMat += diffVec*np.transpose(diffVec)
-    sumMat *= 0.5
-    for i in range(ndim):
-        sumMat[i, i] *= 2
     print sumMat/numSamples
     
 if __name__ == '__main__':
