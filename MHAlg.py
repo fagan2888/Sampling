@@ -28,8 +28,18 @@ class MetropolisHastingsAlgorithm:
 # Sampling sigmoid / Fermi distribution
 class SamplingSigmoidDistribution(MetropolisHastingsAlgorithm):
     def distribution(self, x):
-        return 1/(np.exp((x-self.fermiEnergy))+1) if x>=0 else 0
+        return 1/(np.exp(self.beta*(x-self.fermiEnergy))+1) if x>=0 else 0
         
     def __init__(self):
         MetropolisHastingsAlgorithm.__init__(self)
         self.fermiEnergy = 5
+        self.beta = 10.
+        
+def testrun():
+    s = SamplingSigmoidDistribution()
+    for i in range(15000):
+        s.produceNext()
+    return s.chain
+
+if __name__ == '__main__':
+    testrun()
