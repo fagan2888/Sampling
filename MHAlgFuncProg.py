@@ -16,12 +16,10 @@ def MarkovChain(distfunc, nSamples):
     xArray = np.zeros(nSamples)
     alphaArray = np.zeros(nSamples)
     for i in range(nSamples):
-        xArray[i] = startX if i==0 else normRnd[i]+xArray[i-1]
-        try:
-            alphaArray[i] = min(1., distfunc(xArray[i])/distfunc(startX if i==0 else xArray[i-1]))
-        except ZeroDivisionError:
-            alphaArray[i] = 1.
-        xArray[i] = xArray[i] if alphaArray[i]>unifRnd[i] else (startX if i==0 else xArray[i-1])
+        previousX = startX if i==0 else xArray[i-1]
+        xArray[i] = normRnd[i] + previousX
+        alphaArray[i] = min(1., distfunc(xArray[i])/distfunc(previousX))
+        xArray[i] = xArray[i] if alphaArray[i]>unifRnd[i] else previousX
     return xArray
 
 def testrun():
