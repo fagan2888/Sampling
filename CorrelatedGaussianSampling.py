@@ -5,23 +5,12 @@ Created on Thu Apr 18 10:06:45 2013
 @author: hok1
 """
 
-from operator import add
 import numpy as np
+
+from VectorStatistics import vecMean, covMat
 
 defaultMeanVector = np.array([0, 0])
 defaultCovarianceMatrix = np.array([[1, 0], [0, 1]])
-
-vecMean = lambda vecArray: reduce(add, vecArray)/len(vecArray)
-
-def calculateCovMatrix(vecArray):
-    avgVec = vecMean(vecArray)
-    calDiffVec = lambda vec: (vec-avgVec)
-    calMatrix = lambda diffVec: np.transpose(np.matrix(diffVec))*np.matrix(diffVec)
-    
-    diffVecArray = map(calDiffVec, vecArray)
-    covMatArray = map(calMatrix, diffVecArray)
-    
-    return reduce(add, covMatArray) / len(covMatArray)
 
 class NotHermiteanMatrixException(Exception):
     def __init__(self):
@@ -79,7 +68,7 @@ def test():
     print vecMean(sampledVectors)
 
     # find the covariance matrix
-    print calculateCovMatrix(sampledVectors)
+    print covMat(sampledVectors)
     
 if __name__ == '__main__':
     test()
