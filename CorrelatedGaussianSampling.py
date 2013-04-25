@@ -5,10 +5,23 @@ Created on Thu Apr 18 10:06:45 2013
 @author: hok1
 """
 
+from operator import add
 import numpy as np
 
 defaultMeanVector = np.array([0, 0])
 defaultCovarianceMatrix = np.array([[1, 0], [0, 1]])
+
+vecMean = lambda vecArray: reduce(add, vecArray)/len(vecArray)
+
+def calculateCovMatrix(vecArray):
+    avgVec = vecMean(vecArray)
+    calDiffVec = lambda vec: (vec-avgVec)
+    calMatrix = lambda diffVec: np.transpose(np.matrix(diffVec))*np.matrix(diffVec)
+    
+    diffVecArray = map(calDiffVec, vecArray)
+    covMatArray = map(calMatrix, diffVecArray)
+    
+    return reduce(add, covMatArray) / len(covMatArray)
 
 class NotHermiteanMatrixException(Exception):
     def __init__(self):
@@ -55,7 +68,6 @@ def test():
     numSamples = 15000
     meanVector = np.array([1., -1., 0.])
     covMatrix = np.array([[2., 0.1, 0.], [0.1, 1.5, -0.1], [0., -0.1, 0.01]])
-    ndim = len(meanVector)
     sampler = CorrelatedGaussianSampler(meanVector=meanVector,
                                         covMatrix=covMatrix)
     sampledVectors = []
@@ -64,19 +76,10 @@ def test():
         sampledVectors.append(sampledVector)
     
     # find the mean vector
-    sumVec = np.zeros(ndim)
-    for i in range(numSamples):
-        sumVec += sampledVectors[i]
-    avgVector = np.transpose(np.matrix(sumVec/numSamples))
-    print avgVector
+    print vecMean(sampledVectors)
 
     # find the covariance matrix
-    sumMat = np.matrix(np.zeros([ndim, ndim]))
-    for i in range(numSamples):
-        samVec = np.transpose(np.matrix(sampledVectors[i]))
-        diffVec = samVec - avgVector
-        sumMat += diffVec*np.transpose(diffVec)
-    print sumMat/numSamples
+    print calculateCovMatrix(sampledVectors)
     
 if __name__ == '__main__':
     test()
