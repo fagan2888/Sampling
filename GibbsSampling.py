@@ -38,11 +38,15 @@ def testrun():
     covMatrix = np.array([[2., 0.1, 0.], [0.1, 1.5, -0.1], [0., -0.1, 0.01]])
     ndim = len(meanVector)
 
+    
     f = partial(unnormalizedMultivariateGaussianDist,
                 meanVec = meanVector,
                 covMat = covMatrix)
+    # for testing and comparison purpose
+    invCovMat = np.linalg.inv(covMatrix)
+    f = lambda vec: np.exp(-0.5*np.matrix(vec-meanVector)*np.matrix(invCovMat)*np.transpose(np.matrix(vec-meanVector)))
 
-    chain = MarkovChainByGibbsSampling(f, 100000, ndim)
+    chain = MarkovChainByGibbsSampling(f, 15000, ndim)
     
     print vecMean(chain)
     
