@@ -12,7 +12,7 @@ from VectorStatistics import vecMean, covMat
 
 def MarkovChainByGibbsSampling(distfunc, nSamples, ndim):
     # implementing Gibbs sampling
-    startVec = np.array([1.]*ndim)
+    startVec = np.array([0.]*ndim)
     normRnd = [[np.random.normal() for j in range(ndim)] for i in range(nSamples)]
     unifRnd = [[np.random.uniform() for j in range(ndim)] for i in range(nSamples)]
     vecArray = np.zeros([nSamples, ndim])
@@ -28,11 +28,12 @@ def MarkovChainByGibbsSampling(distfunc, nSamples, ndim):
 
 def unnormalizedMultivariateGaussianDist(vec, meanVec, covMat):
     dVec = np.transpose(np.matrix(vec-meanVec))
-    return np.exp(-0.5*np.transpose(dVec)*np.matrix(covMat)*dVec)
+    invCovMat = np.linalg.inv(covMat)
+    return np.exp(-0.5*np.transpose(dVec)*np.matrix(invCovMat)*dVec)
 
 def testrun():
     #meanVector = np.array([1., -1.])
-    #covMatrix = np.array([[1, 0], [0, 1]])
+    #covMatrix = np.array([[1., 0], [0, 2.]])
     meanVector = np.array([1., -1., 0.])
     covMatrix = np.array([[2., 0.1, 0.], [0.1, 1.5, -0.1], [0., -0.1, 0.01]])
     ndim = len(meanVector)
@@ -41,7 +42,7 @@ def testrun():
                 meanVec = meanVector,
                 covMat = covMatrix)
 
-    chain = MarkovChainByGibbsSampling(f, 1000000, ndim)
+    chain = MarkovChainByGibbsSampling(f, 100000, ndim)
     
     print vecMean(chain)
     
